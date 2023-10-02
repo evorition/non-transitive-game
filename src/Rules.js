@@ -6,11 +6,11 @@ export default class Rules {
   decideWinner(cpuMove, humanMove) {
     const diff = (humanMove - cpuMove + this.movesLength) % this.movesLength;
     if (diff === 0) {
-      return "It's a draw!";
+      return "Draw";
     } else if (diff <= Math.floor(this.movesLength / 2)) {
-      return "You win!";
+      return "Win";
     } else {
-      return "You lose!";
+      return "Lose";
     }
   }
 }

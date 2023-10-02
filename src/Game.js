@@ -3,6 +3,7 @@ import readline from "readline";
 import Key from "./Key.js";
 import HmacGenerator from "./HmacGenerator.js";
 import Rules from "./Rules.js";
+import Table from "./Table.js";
 
 export default class Game {
   constructor() {
@@ -55,12 +56,9 @@ export default class Game {
     const keyInstance = new Key();
     const secretKey = keyInstance.secretKey;
 
-    this.cpuIndex = this.makeMove();
+    const cpuIndex = this.makeMove();
 
-    const hmacGenerator = new HmacGenerator(
-      secretKey,
-      this.moves[this.cpuIndex]
-    );
+    const hmacGenerator = new HmacGenerator(secretKey, this.moves[cpuIndex]);
     const hmac = hmacGenerator.generateHmac("sha3-256");
     console.log(`HMAC: ${hmac}`);
 
@@ -76,7 +74,10 @@ export default class Game {
         this.rl.close();
         process.exit(0);
       } else if (userMove === "?") {
-        // TODO: Show table
+        const table = new Table(this.moves);
+        table.showTable();
+        userIndex = -1;
+        this.showMenu();
       } else {
         userIndex = parseInt(userMove, 10) - 1;
         if (
@@ -94,10 +95,12 @@ export default class Game {
     } while (userIndex === -1);
 
     console.log(`Your move: ${this.moves[userIndex]}`);
-    console.log(`Computer move: ${this.moves[this.cpuIndex]}`);
+    console.log(`Computer move: ${this.moves[cpuIndex]}`);
 
     const rules = new Rules(this.moves);
-    const result = rules.decideWinner(this.cpuIndex, userIndex);
+    let result = rules.decideWinner(cpuIndex, userIndex).toLowerCase();
+    result =
+      result.toLowerCase() === "draw" ? `It's a ${result}!` : `You ${result}!`;
 
     console.log(result);
     console.log(`HMAC key: ${secretKey}`);
